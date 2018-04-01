@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from './axios-auth'
 import globalAxios from 'axios'
+import router from './router'
 
 Vue.use(Vuex)
 
@@ -19,7 +20,11 @@ export default new Vuex.Store({
 	  },
 		storeUser(state, user) { 
 			state.user = user
-		}
+	  },
+	  clearAuthData(state) { 
+		  state.idToken = null
+		  state.userId = null
+	  }
   },
   actions: {
 	  signup({ commit, dispatch }, authData) {
@@ -80,11 +85,22 @@ export default new Vuex.Store({
 				})
 			})
 	  			.catch(error => console.log(error))
-  		}	
+	  },
+	  logout({ commit }) { 
+			commit('clearAuthData')
+			
+		//if you are on any page and logout, this pushes you back to the signin screen
+		  	router.replace('/signin')
+	  }
   	},
 	  getters: {
 		user (state) {
 		  return state.user
-		}
+		  },
+		  //added this for the header - so if user is not logged in will show
+		  //different stuff...on header used computed 
+		  isAuthenticated(state) { 
+			  return state.idToken !== null
+		  }  
 	  }
 })
