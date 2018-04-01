@@ -25,7 +25,9 @@
 </template>
 
 <script>
-	import axios from '../../axios-auth'
+		 /* MOVED VUEX DATASTORE
+import axios from '../../axios-auth
+*/
   export default {
     data () {
       return {
@@ -40,13 +42,16 @@
           password: this.password,
         }
 		console.log(formData)
+		 /* MOVED VUEX DATASTORE 
 		 axios.post('/verifyPassword?key=AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE', {
           email: formData.email,
           password: formData.password,
           returnSecureToken: true
 		})
           .then(res => console.log(res))
-          .catch(error => console.log(error))
+		  .catch(error => console.log(error)) */
+		  
+			  this.$store.dispatch('login', {email:formData.email, password: formData.password})
       }
     }
   }

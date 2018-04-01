@@ -7,15 +7,16 @@
 </template>
 
 <script>
-import axios from 'axios';
+	import axios from 'axios';
 
-export default {
-	data() {
-		return{
-			email: ''
+	export default {
+	computed: {
+		email() {
+		   return !this.$store.getters.user ? false : this.$store.getters.user.email		
 		}
 	},
 	created() {
+		/* MOVED TO VUEX STORE 
 		 axios.get('/users.json')
 	  	.then(res => {
 			console.log(res)
@@ -28,7 +29,8 @@ export default {
 		 	}	 
 			console.log(users)
 			this.email = users[0].email
-		})
+		}) */
+		this.$store.dispatch('fetchUser')
 	}
 }	
 </script>

@@ -69,9 +69,12 @@
 </template>
 
 <script>
-// custom axios instance
-import axios from "../../axios-auth";
 //import axios from 'axios'
+
+/* custom axios instance
+MOVED VUEX STORE
+import axios from "../../axios-auth";
+ */
 
 export default {
   data() {
@@ -105,8 +108,9 @@ export default {
         country: this.country,
         hobbies: this.hobbyInputs.map(hobby => hobby.value),
         terms: this.terms
-      };
+      }
 	  console.log(formData);
+	  /* was here - moved to vuex store 
 	   axios.post('/signupNewUser?key=AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE', {
           email: formData.email,
           password: formData.password,
@@ -114,10 +118,15 @@ export default {
 		})
           .then(res => console.log(res))
           .catch(error => console.log(error))
-      }
+	  } */
+
+/* 		replaced this when setup storeUser data in store
+	  this.$store.dispatch('signup', {email:formData.email, password: formData.password}) */
+
+	  this.$store.dispatch('signup', formData)
+  	}
   }
-};
-//AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE
+}
 </script>
 
 <style scoped>
