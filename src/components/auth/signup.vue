@@ -69,7 +69,9 @@
 </template>
 
 <script>
+// custom axios instance
 import axios from "../../axios-auth";
+//import axios from 'axios'
 
 export default {
   data() {
@@ -105,12 +107,17 @@ export default {
         terms: this.terms
       };
 	  console.log(formData);
-	  axios.post('/users.json', formData)
-	  .then(res => console.log(res))
-	  .catch(error=>console.log(error))
-    }
+	   axios.post('/signupNewUser?key=AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE', {
+          email: formData.email,
+          password: formData.password,
+          returnSecureToken: true
+		})
+          .then(res => console.log(res))
+          .catch(error => console.log(error))
+      }
   }
 };
+//AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE
 </script>
 
 <style scoped>
