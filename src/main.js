@@ -11,6 +11,16 @@ axios.defaults.baseURL = 'https://maxmeetup-251d0.firebaseio.com/'
 axios.defaults.headers.common['Authorization']='asdf'
 axios.defaults.headers.get['Accepts']='application/json'
 
+axios.interceptors.request.use(config => { 
+	console.log('request: ',config)
+	return config
+})
+
+axios.interceptors.response.use(res => {
+	console.log('response',res)
+	return res
+ } )
+
 new Vue({
   el: '#app',
   router,
