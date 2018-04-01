@@ -105,7 +105,7 @@ export default {
         terms: this.terms
       };
 	  console.log(formData);
-	  axios.post('https://maxmeetup-251d0.firebaseio.com/users.json', formData)
+	  axios.post('/users.json', formData)
 	  .then(res => console.log(res))
 	  .catch(error=>console.log(error))
     }
