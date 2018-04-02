@@ -26,12 +26,18 @@ export default new Vuex.Store({
 		  state.userId = null
 	  }
   },
-  actions: {
-	  signup({ commit, dispatch }, authData) {
-		  axios.post('/signupNewUser?key=AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE', {
-			  email: authData.email,
-			  password: authData.password,
-			  returnSecureToken: true
+	actions: {
+		//this action will clear the user's session after a set period
+		setLogoutTimer({commit, dispatch}, expirationTime) { 
+			setTimeout(() => {
+				dispatch('logout')
+			}, expirationTime * 1000)
+		},
+	  	signup({ commit, dispatch }, authData) {
+		  	axios.post('/signupNewUser?key=AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE', {
+			email: authData.email,
+			password: authData.password,
+			returnSecureToken: true
 		  })
 			  .then(res => {
 				  console.log(res)
@@ -39,7 +45,16 @@ export default new Vuex.Store({
 					  idToken: res.data.idToken,
 					  userId: res.data.localId
 				  })
+				  //storing session credentials to local for a period of time
+				  const now = new Date()
+				  //convert to milliseconds
+				  const expirationDate = new Date(now.getTime() + res.data.expiresIn * 1000)
+				  localStorage.setItem('token', res.data.idToken)
+				  localStorage.setItem('expiresIn', expirationDate)
 				  dispatch('storeUser', authData)
+				  //logout after period of time
+				  dispatch('setLogoutTimer', res.data.expiresIn)  
+
 	  			})
 			.catch(error => console.log(error))
 	  },
@@ -71,24 +86,53 @@ export default new Vuex.Store({
 		  })
 		  .catch(error => console.log(error))
 	  }, 
-	  login({commit}, authData) { 
+	  login({commit, dispatch}, authData) { 
 		axios.post('/verifyPassword?key=AIzaSyA8ouwUf-dzpJ3rbYd4oZ5V_o4ZwkaCRWE', {
 			email: authData.email,
 			password: authData.password,
 			returnSecureToken: true
 		  })
 		  .then(res => {
-			console.log(res)
+				//storing session credentials to local for a period of time
+				const now = new Date()
+			  const expirationDate = new Date(now.getTime() + res.data.expiresIn * 1000)
+				localStorage.setItem('token', res.data.idToken)
+			  localStorage.setItem('expirationDate', expirationDate)
+
+			  //couldnt see it in the application section of the chrome dev tools - could see it in firefox
+			  console.log('after', localStorage.getItem("token")) 
+			 console.log('afterDate', localStorage.getItem("expirationDate")) 
+			   
 			commit('authUser', {
 				idToken: res.data.idToken,
 				userId: res.data.localId
-				})
+			})
+			//logout after a set period  
+			dispatch('setLogoutTimer', res.data.expiresIn)  
 			})
 	  			.catch(error => console.log(error))
-	  },
+		},
+		tryAutoLogin ({commit}) {
+			const token = localStorage.getItem('token')
+			if (!token) {
+			  return
+			}
+			const expirationDate = localStorage.getItem('expirationDate')
+			const now = new Date()
+			if (now >= expirationDate) {
+			  return
+			}
+			const userId = localStorage.getItem('userId')
+			commit('authUser', {
+			  token: token,
+			  userId: userId
+			})
+		  },
 	  logout({ commit }) { 
 			commit('clearAuthData')
-			
+		  localStorage.removeItem('expirationDate')
+		  localStorage.removeItem('token') 
+		  localStorage.removeItem('userId')
 		//if you are on any page and logout, this pushes you back to the signin screen
 		  	router.replace('/signin')
 	  }
