@@ -7,31 +7,36 @@
           <input
                   type="email"
                   id="email"
-				  @input="$v.email.$touch()"
+				  @blur="$v.email.$touch()"
                   v-model="email">
 				  <!-- <div>V: {{$v}}</div> -->
 				  <p v-if="!$v.email.email">Provide valid email address</p>
         </div>
-        <div class="input">
+        <div class="input" :class="{invalid: $v.age.$error}">
           <label for="age">Your Age</label>
           <input
                   type="number"
                   id="age"
+				  @blur="$v.age.$touch()"
                   v-model.number="age">
+				  <p v-if="!$v.age.minVal">You have to be at least {{$v.age.$params.minVal.min }} years old.</p>
         </div>
-        <div class="input">
+        <div class="input" :class="{invalid: $v.password.$error}">
           <label for="password">Password</label>
           <input
                   type="password"
                   id="password"
+				  @blur="$v.password.$touch()"
                   v-model="password">
         </div>
-        <div class="input">
+        <div class="input" :class="{invalid: $v.confirmPassword.$error}">
           <label for="confirm-password">Confirm Password</label>
           <input
-                  type="password"
-                  id="confirm-password"
-                  v-model="confirmPassword">
+                	type="password"
+                	id="confirm-password"
+					@blur="$v.confirmPassword.$touch()"
+                	v-model="confirmPassword">
+					<p v-if="!$v.confirmPassword.sameAs">not same</p>
         </div>
         <div class="input">
           <label for="country">Country</label>
@@ -79,7 +84,7 @@ MOVED VUEX STORE
 import axios from "../../axios-auth";
  */
 
-import { required, email} from 'vuelidate/lib/validators'
+import { required, email, numeric, minValue, minLength, sameAs} from 'vuelidate/lib/validators'
 
 export default {
   data() {
@@ -97,6 +102,23 @@ export default {
 	  email: {
 		  required: required,
 		  email: email
+	  },
+	  age: {
+		  required,
+		  numeric,
+		  minVal:minValue(18)
+	  },
+	  password: {
+		  required,
+		  minLen: minLength(6)
+	  },
+	  confirmPassword: {
+		  required,
+//	Two ways of doing this - the second allows a bit more flexibility by concatening values		  
+//		  sameAs: sameAs('password')
+		 sameAs: sameAs(vm => {
+			 return vm.password
+		 })
 	  }
   },
   methods: {
